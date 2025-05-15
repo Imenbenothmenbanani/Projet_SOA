@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package salle;
+
+// === Entités ===
+message Salle {
+  string id = 1;
+  string nom = 2;
+  int32 capacite = 3;
+  string localisation = 4;
+  bool disponible = 5;
+}
+
+// === Requêtes / Réponses ===
+
+message GetSalleRequest {
+  string salle_id = 1;
+}
+
+message GetSalleResponse {
+  Salle salle = 1;
+}
+
+message SearchSallesRequest {
+  string query = 1;
+}
+
+message SearchSallesResponse {
+  repeated Salle salles = 1;
+}
+
+message CreateSalleRequest {
+  string id = 1;
+  string nom = 2;
+  int32 capacite = 3;
+  string localisation = 4;
+}
+
+message CreateSalleResponse {
+  Salle salle = 1;
+}
+
+message ReserverSalleRequest {
+  string salle_id = 1;
+  string client_id = 2;
+  string date = 3;
+  string heure_debut = 4;
+  string heure_fin = 5;
+}
+
+message ReserverSalleResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// === Service ===
+
+service SalleService {
+  rpc GetSalle(GetSalleRequest) returns (GetSalleResponse);
+  rpc SearchSalles(SearchSallesRequest) returns (SearchSallesResponse);
+  rpc CreateSalle(CreateSalleRequest) returns (CreateSalleResponse);
+  rpc ReserverSalle(ReserverSalleRequest) returns (ReserverSalleResponse);
+}

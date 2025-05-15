@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  salle-service:
+    build:
+      context: ./salle  # Dossier où se trouve le Dockerfile de Salle
+    container_name: salle-service
+    ports:
+      - "50052:50052"  # Port sur lequel ce service est exposé
+    networks:
+      - soa-network
+    environment:
+      - SERVICE_HOST=salle-service  # Nom du service dans Docker
+
+  client-service:
+    build:
+      context: ./client  # Dossier où se trouve le Dockerfile de Client
+    container_name: client-service
+    ports:
+      - "50053:50053"  # Port sur lequel ce service est exposé
+    networks:
+      - soa-network
+    environment:
+      - SERVICE_HOST=client-service  # Nom du service dans Docker
+
+  api-gateway:
+    build:
+      context: ./apiGetway  # Dossier où se trouve le Dockerfile de l’API Gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"  # Port de l'API Gateway
+    depends_on:
+      - salle-service
+      - client-service
+    networks:
+      - soa-network
+    environment:
+      - SALLE_SERVICE_HOST=salle-service:50052  # Utilisation de l'adresse du service Salle
+      - CLIENT_SERVICE_HOST=client-service:50053  # Utilisation de l'adresse du service Client
+
+networks:
+  soa-network:
+    driver: bridge
