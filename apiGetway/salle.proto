@@ -34,10 +34,31 @@ message CreateSalleRequest {
   string nom = 2;
   int32 capacite = 3;
   string localisation = 4;
+  bool disponible = 5;
 }
 
 message CreateSalleResponse {
   Salle salle = 1;
+}
+
+message UpdateSalleRequest {
+  string id = 1;
+  string nom = 2;
+  int32 capacite = 3;
+  string localisation = 4;
+  bool disponible = 5;
+}
+
+message UpdateSalleResponse {
+  Salle salle = 1;
+}
+
+message DeleteSalleRequest {
+  string salle_id = 1;
+}
+
+message DeleteSalleResponse {
+  bool success = 1;
 }
 
 message ReserverSalleRequest {
@@ -59,5 +80,7 @@ service SalleService {
   rpc GetSalle(GetSalleRequest) returns (GetSalleResponse);
   rpc SearchSalles(SearchSallesRequest) returns (SearchSallesResponse);
   rpc CreateSalle(CreateSalleRequest) returns (CreateSalleResponse);
+  rpc UpdateSalle(UpdateSalleRequest) returns (UpdateSalleResponse);
+  rpc DeleteSalle(DeleteSalleRequest) returns (DeleteSalleResponse);
   rpc ReserverSalle(ReserverSalleRequest) returns (ReserverSalleResponse);
 }

@@ -28,9 +28,38 @@ message CreateClientRequest {
   string id = 1;
   string nom = 2;
   string email = 3;
+  string password = 4;
 }
 
 message CreateClientResponse {
+  Client client = 1;
+}
+
+message UpdateClientRequest {
+  string id = 1;
+  string nom = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message UpdateClientResponse {
+  Client client = 1;
+}
+
+message DeleteClientRequest {
+  string client_id = 1;
+}
+
+message DeleteClientResponse {
+  bool success = 1;
+}
+
+message AuthenticateRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AuthenticateResponse {
   Client client = 1;
 }
 
@@ -38,4 +67,7 @@ service ClientService {
   rpc GetClient(GetClientRequest) returns (GetClientResponse);
   rpc SearchClients(SearchClientsRequest) returns (SearchClientsResponse);
   rpc CreateClient(CreateClientRequest) returns (CreateClientResponse);
+  rpc UpdateClient(UpdateClientRequest) returns (UpdateClientResponse);
+  rpc DeleteClient(DeleteClientRequest) returns (DeleteClientResponse);
+  rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
 }

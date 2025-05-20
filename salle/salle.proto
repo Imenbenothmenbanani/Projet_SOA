@@ -3,13 +3,21 @@ syntax = "proto3";
 package salle;
 
 // === Entités ===
-
 message Salle {
   string id = 1;
   string nom = 2;
   int32 capacite = 3;
   string localisation = 4;
   bool disponible = 5;
+}
+
+message Reservation {
+  string id = 1;
+  string salle_id = 2;
+  string client_id = 3;
+  string date = 4;
+  string heure_debut = 5;
+  string heure_fin = 6;
 }
 
 // === Requêtes / Réponses ===
@@ -35,13 +43,34 @@ message CreateSalleRequest {
   string nom = 2;
   int32 capacite = 3;
   string localisation = 4;
+  bool disponible = 5;
 }
 
 message CreateSalleResponse {
   Salle salle = 1;
 }
 
-message ReserverSalleRequest {
+message UpdateSalleRequest {
+  string id = 1;
+  string nom = 2;
+  int32 capacite = 3;
+  string localisation = 4;
+  bool disponible = 5;
+}
+
+message UpdateSalleResponse {
+  Salle salle = 1;
+}
+
+message DeleteSalleRequest {
+  string salle_id = 1;
+}
+
+message DeleteSalleResponse {
+  bool success = 1;
+}
+
+message CreateReservationRequest {
   string salle_id = 1;
   string client_id = 2;
   string date = 3;
@@ -49,16 +78,90 @@ message ReserverSalleRequest {
   string heure_fin = 5;
 }
 
-message ReserverSalleResponse {
+message CreateReservationResponse {
+  Reservation reservation = 1;
+}
+
+message UpdateReservationRequest {
+  string id = 1;
+  string salle_id = 2;
+  string client_id = 3;
+  string date = 4;
+  string heure_debut = 5;
+  string heure_fin = 6;
+}
+
+message UpdateReservationResponse {
+  Reservation reservation = 1;
+}
+
+message DeleteReservationRequest {
+  string reservation_id = 1;
+}
+
+message DeleteReservationResponse {
   bool success = 1;
-  string message = 2;
+}
+
+message GetReservationRequest {
+  string reservation_id = 1;
+}
+
+message GetReservationResponse {
+  Reservation reservation = 1;
+}
+
+message GetSalleReservationsRequest {
+  string salle_id = 1;
+}
+
+message GetSalleReservationsResponse {
+  repeated Reservation reservations = 1;
+}
+
+message GetClientReservationsRequest {
+  string client_id = 1;
+}
+
+message GetClientReservationsResponse {
+  repeated Reservation reservations = 1;
+}
+
+message CheckDisponibiliteRequest {
+  string salle_id = 1;
+  string date = 2;
+  string heure_debut = 3;
+  string heure_fin = 4;
+}
+
+message CheckDisponibiliteResponse {
+  bool disponible = 1;
+}
+
+message GetAllSallesRequest {
+  // Vide car nous voulons toutes les salles sans critères
+}
+
+message GetAllSallesResponse {
+  repeated Salle salles = 1;
 }
 
 // === Service ===
 
 service SalleService {
   rpc GetSalle(GetSalleRequest) returns (GetSalleResponse);
+  rpc GetAllSalles(GetAllSallesRequest) returns (GetAllSallesResponse);
   rpc SearchSalles(SearchSallesRequest) returns (SearchSallesResponse);
   rpc CreateSalle(CreateSalleRequest) returns (CreateSalleResponse);
-  rpc ReserverSalle(ReserverSalleRequest) returns (ReserverSalleResponse);
+  rpc UpdateSalle(UpdateSalleRequest) returns (UpdateSalleResponse);
+  rpc DeleteSalle(DeleteSalleRequest) returns (DeleteSalleResponse);
+  
+  // Gestion des réservations
+  rpc CreateReservation(CreateReservationRequest) returns (CreateReservationResponse);
+  rpc UpdateReservation(UpdateReservationRequest) returns (UpdateReservationResponse);
+  rpc DeleteReservation(DeleteReservationRequest) returns (DeleteReservationResponse);
+  rpc GetReservation(GetReservationRequest) returns (GetReservationResponse);
+  rpc GetSalleReservations(GetSalleReservationsRequest) returns (GetSalleReservationsResponse);
+  rpc GetClientReservations(GetClientReservationsRequest) returns (GetClientReservationsResponse);
+  rpc CheckDisponibilite(CheckDisponibiliteRequest) returns (CheckDisponibiliteResponse);
 }
