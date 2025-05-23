@@ -1,43 +1,88 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  salle-service:
-    build:
-      context: ./salle  # Dossier où se trouve le Dockerfile de Salle
-    container_name: salle-service
-    ports:
-      - "50052:50052"  # Port sur lequel ce service est exposé
-    networks:
-      - soa-network
-    environment:
-      - SERVICE_HOST=salle-service  # Nom du service dans Docker
-
-  client-service:
-    build:
-      context: ./client  # Dossier où se trouve le Dockerfile de Client
-    container_name: client-service
-    ports:
-      - "50053:50053"  # Port sur lequel ce service est exposé
-    networks:
-      - soa-network
-    environment:
-      - SERVICE_HOST=client-service  # Nom du service dans Docker
-
   api-gateway:
     build:
-      context: ./apiGetway  # Dossier où se trouve le Dockerfile de l’API Gateway
-    container_name: api-gateway
+      context: ./apiGateway
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"  # Port de l'API Gateway
+      - "3000:3000"
     depends_on:
-      - salle-service
-      - client-service
+      - client
+      - reservation 
+      - salle
+      - kafka
     networks:
-      - soa-network
+      - my-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "50053:50053"
+    networks:
+      - my-network
+
+  reservation:
+    build:
+      context: ./reservation
+      dockerfile: Dockerfile
+    ports:
+      - "50054:50054"
+    depends_on:
+      - kafka
+    networks:
+      - my-network
+
+  salle:
+    build:
+      context: ./salle
+      dockerfile: Dockerfile
+    ports:
+      - "50052:50052"
+    networks:
+      - my-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
     environment:
-      - SALLE_SERVICE_HOST=salle-service:50052  # Utilisation de l'adresse du service Salle
-      - CLIENT_SERVICE_HOST=client-service:50053  # Utilisation de l'adresse du service Client
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - my-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    command:
+      - "/bin/bash"
+      - "-c"
+      - "while ! nc -z zookeeper 2181; do sleep 1; done; /etc/confluent/docker/run"
+    networks:
+      - my-network
+
+  kafka-consumer:
+    build:
+      context: ./kafka
+      dockerfile: Dockerfile
+    depends_on:
+      - kafka
+    restart: always
+    networks:
+      - my-network
 
 networks:
-  soa-network:
+  my-network:
     driver: bridge
+
+

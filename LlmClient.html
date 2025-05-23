@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LLM Client Tester</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f0f0;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .response {
+      margin-top: 30px;
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      color: #333;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="section">
+      <h2>Formulaire de Réservation</h2>
+      <label>Nom:</label>
+      <input type="text" id="nom" placeholder="Entrez votre nom">
+
+      <label>Prénom:</label>
+      <input type="text" id="prenom" placeholder="Entrez votre prénom">
+
+      <label>Numéro de chambre:</label>
+      <input type="number" id="numeroChambre" placeholder="Ex: 101">
+
+      <label>Date de début:</label>
+      <input type="date" id="dateDebut">
+
+      <label>Date de fin:</label>
+      <input type="date" id="dateFin">
+
+      <button onclick="envoyerReservation()">Réserver</button>
+
+      <div id="reservationAffichage" class="response"></div>
+    </div>
+
+    <div class="section">
+      <h2>LLM Client - Image + Prompt</h2>
+
+      <label>Text Prompt:</label>
+      <input type="text" id="prompt" placeholder="Pose ta question au LLM...">
+
+      <label>Image URL:</label>
+      <input type="text" id="imageUrl" placeholder="https://exemple.com/image.jpg">
+
+      <button onclick="sendToLLM()">Envoyer</button>
+    </div>
+
+    <div class="response" id="responseBox">La réponse apparaîtra ici...</div>
+
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:3002"; // Port du microservice Node.js
+
+    async function envoyerReservation() {
+      const nom = document.getElementById('nom').value;
+      const prenom = document.getElementById('prenom').value;
+      const numeroChambre = document.getElementById('numeroChambre').value;
+      const dateDebut = document.getElementById('dateDebut').value;
+      const dateFin = document.getElementById('dateFin').value;
+
+      const reservation = {
+        nom,
+        prenom,
+        numeroChambre,
+        dateDebut,
+        dateFin
+      };
+
+      // 1. Affichage dans la page
+      const affichage = `
+✅ Réservation envoyée :
+Nom : ${nom}
+Prénom : ${prenom}
+Chambre : ${numeroChambre}
+Du ${dateDebut} au ${dateFin}
+      `;
+      document.getElementById('reservationAffichage').innerText = affichage;
+
+      // 2. Envoi au backend Node.js
+      try {
+        const res = await fetch(`${API_BASE}/reservation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reservation)
+        });
+
+        const data = await res.json();
+        console.log('Réponse du backend :', data);
+      } catch (error) {
+        console.error('Erreur lors de l’envoi :', error);
+      }
+    }
+
+    async function sendToLLM() {
+      const prompt = document.getElementById('prompt').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt, imageUrl })
+      });
+
+      const data = await res.json();
+      document.getElementById('responseBox').innerText = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>
+ 

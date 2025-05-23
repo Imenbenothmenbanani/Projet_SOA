@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package reservation;
+
+service ReservationService {
+  rpc CreateReservation (CreateReservationRequest) returns (ReservationResponse);
+  rpc GetReservationById (ReservationIdRequest) returns (ReservationResponse);
+  rpc GetReservationsByUser (UserIdRequest) returns (ReservationListResponse);
+  rpc CancelReservation (ReservationIdRequest) returns (CancelReservationResponse);
+  rpc UpdateReservation (UpdateReservationRequest) returns (ReservationResponse);
+  rpc ListAllReservations (Empty) returns (ReservationListResponse);
+}
+
+message CreateReservationRequest {
+  string user_id = 1;
+  int32 room_number = 2;
+  string start_date = 3;
+  string end_date = 4;
+}
+
+message UpdateReservationRequest {
+  string reservation_id = 1;
+  int32 room_number = 2;
+  string start_date = 3;
+  string end_date = 4;
+}
+
+message ReservationResponse {
+  string reservation_id = 1;
+  string user_id = 2;
+  int32 room_number = 3;
+  string start_date = 4;
+  string end_date = 5;
+  string status = 6;  // par exemple "confirmed", "cancelled", etc.
+}
+
+message ReservationIdRequest {
+  string reservation_id = 1;
+}
+
+message UserIdRequest {
+  string user_id = 1;
+}
+
+message ReservationListResponse {
+  repeated ReservationResponse reservations = 1;
+}
+
+message CancelReservationResponse {
+  string message = 1;
+}
+
+message Empty {}
