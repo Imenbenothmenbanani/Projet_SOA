@@ -85,8 +85,8 @@ Serveur Node.js via Express (`server.js`) :
 
 ```bash
 # 1. Cloner le projet
-git clone https://github.com/Imenbenothmenbanani//llm-client.git
-cd llm-client
+git clone https://github.com/Imenbenothmenbanani/Projet_SOA.git
+cd Projet_SOA.git
 
 # 2. Installer les dépendances
 npm install
